@@ -13,8 +13,8 @@ class Stack {
 
 		Node(T inputSymbol) :symbol(inputSymbol), next(nullptr) {};
 	};
-	Node* head;
 public:
+	Node* head;
 	Stack() :head(nullptr) {};
 	void push(T symbol) {
 		Node* newEl = new Node(symbol);
@@ -79,6 +79,8 @@ bool realization(string inputString) {
 			currentNumber = calculate(stackForNum, stackForOp, currentNumber);
 			stackForNum->pop();
 			stackForNum->pop();
+			stackForOp->pop();
+			stackForNum->push(currentNumber);
 		}
 		else if (c == '+' || c == '*') {
 			stackForOp->push(c);
@@ -88,6 +90,8 @@ bool realization(string inputString) {
 		}
 	}
 	currentNumber = calculate(stackForNum, stackForOp, currentNumber);
+	delete stackForNum;
+	delete stackForOp;
 	return currentNumber;
 }
 
@@ -96,7 +100,7 @@ bool calculate(Stack<bool>* boolStack,Stack<char>* charStack, bool currentNumber
 	switch (op)
 	{
 	case '+': {
-		if (currentNumber == 0 && boolStack->peek() == 0) {
+		if (boolStack->head->next->symbol == 0 && boolStack->peek() == 0) {
 			return 0;
 		}
 		else {
@@ -105,7 +109,7 @@ bool calculate(Stack<bool>* boolStack,Stack<char>* charStack, bool currentNumber
 		break;
 	}
 	case '*': {
-		if (currentNumber == 1 && boolStack->peek() == 1) {
+		if (boolStack->head->next->symbol == 1 && boolStack->peek() == 1) {
 			return 1;
 		}
 		else {
@@ -114,7 +118,7 @@ bool calculate(Stack<bool>* boolStack,Stack<char>* charStack, bool currentNumber
 		break;
 	}
 	case '~': {
-		currentNumber = !currentNumber;
+		return !boolStack->peek();
 		break;
 	}
 	default:
@@ -124,8 +128,34 @@ bool calculate(Stack<bool>* boolStack,Stack<char>* charStack, bool currentNumber
 }
 
 int main() {
-	string str = "(0*1)+(1*0)";
-	cout << boolalpha;
-	cout << realization(str);
-	return 0;
+	setlocale(LC_ALL, "ru");
+	cout << "Press 1 for start:\n"
+		<< "1. Ввести логическое выражение\n\n" <<
+		"Правила ввода: <ЛВ>::=1|0|(~<ЛВ>)|(<ЛВ>*<ЛВ>)|(<ЛВ>+<ЛВ>), где 0 означает false, 1 - true, ~ - отрицание\n"
+		<< "* - конъюнкцию, + - дизъюнкцию\n" << endl;
+	int choice = 0;
+	do {
+		cout << "Ввод: ";
+		cin >> choice;
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Ошибка: введите число 1." << endl;
+		}
+	} while (choice != 1);
+
+	char choiceForDo;
+	do {
+		system("cls");
+		cout << "Пример ввода: (1+1)*0" << endl;
+		cout << "Введите логическое выражениe:   ";
+		string logic;
+		cin >> logic;
+		cout << boolalpha;
+		cout << realization(logic) << endl;
+		cout << "Для выхода нажать - N/n" << endl;
+		cout << "Ввод:";
+		cin >> choiceForDo;
+
+	} while (choiceForDo != 'n' && choiceForDo != 'N');
 }
